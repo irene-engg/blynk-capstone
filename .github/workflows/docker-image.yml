@@ -1,0 +1,31 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+
+  build-and-push:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v3
+      with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+    
+    - name: Build and push images
+      run: docker-compose build
+           docker tag blynk-frontend:latest ${{ secrets.DOCKER_HUB_USERNAME }}/blynk-frontend:latest
+           docker tag blynk-backend:latest ${{ secrets.DOCKER_HUB_USERNAME }}/blynk-backend:latest
+           docker push ${{ secrets.DOCKER_HUB_USERNAME }}/blynk-frontend:latest
+           docker push ${{ secrets.DOCKER_HUB_USERNAME }}/blynk-backend:latest       
+
